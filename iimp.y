@@ -29,26 +29,29 @@ ce ne doit pas etre un token */
 %start A
 
 %%
-A: C		    { ENV e = Envalloc(); start(&e,$1);}
+A: C			{ENV e = Envalloc(); start(&e,$1);}
 ;
 
-E: E Pl T {$$=creerNoeudide($1,$3,"pl");}
- | E Mo T {$$=creerNoeudide($1,$3,"-");}
- | T 
+E: E Pl T 		{$$=creerNoeudide($1,$3,"+");}
+| E Mo T 		{$$=creerNoeudide($1,$3,"-");}
+| T 
+;
 
-T: T Mu F {$$=creerNoeudide($1,$3,"*");}
- | F 
+T: T Mu F 		{$$=creerNoeudide($1,$3,"*");}
+| F 
+;
 
 F: '(' E ')'
- | I {$$=$1;}
- | V {$$=$1;}
+| I 			{$$=$1;}
+| V			{$$=$1;}
+;
 
-C : V Af E { $$=creerNoeudide($1,$3,":="); ENV e = Envalloc(); start(&e,$$);}
-  | Sk {$$=creerNoeudide(NULL,NULL,"skip");}
-  | '(' C ')' {$$=$2;}
-  | If E Th C El C {$$=creerNoeudide(creerNoeudide($2,$4,"then"),creerNoeudide($4,$6,"else"),"if");}
-  | Wh E Do C  {$$=creerNoeudide($2,$4,"while");}
-  | C Se C {$$=creerNoeudide($1,$3,";");}
+C : V Af E 		{$$=creerNoeudide($1,$3,":=");}
+| Sk 			{$$=creerNoeudide(NULL,NULL,"skip");}
+| '(' C ')' 		{$$=$2;}
+| If E Th C El C 	{$$=creerNoeudide(creerNoeudide($2,$4,"then"),creerNoeudide($4,$6,"else"),"if");}
+| Wh E Do C 		{$$=creerNoeudide($2,$4,"while");}
+| C Se C 		{$$=creerNoeudide($1,$3,";");}
 ;
 
 %%
@@ -59,9 +62,12 @@ int yyerror(char *s) {
 	return 0;
 }
 
-int main(void) {
-	yyparse();
-	return 0;
+int yywrap(){
+	return -1;
+}
+
+int main(){
+	return yyparse();
 }
 
 
