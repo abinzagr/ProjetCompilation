@@ -32,7 +32,7 @@ int traitement(ENV *e,noeud *n) {
 	switch(n->type) {
 	    case 1:   return n->data.valeur;
 	    case 2:   return valch(*e,n->data.var); 
-	    case 3:  
+	    case 3:   return 1;
 		if(strcmp(n->data.var,"while")==0){
 	 		while(traitement(e,n->fils_gauche))
 				traitement(e,n->fils_droit);

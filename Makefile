@@ -2,24 +2,16 @@
 BISON = bison -d
 LEX = flex -o 
 CC = gcc
-CFLAGS=-std=c99 -Wall
+CFLAGS=-std=c99 -Wall -g
 LDFLAGS:= -lfl
 
 %.o : %.c %.h 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-iimp: iimp.tab.o iimpl.o
-	$(CC) $(CFLAGS) -o iimp $^
-	
-	$(MAKE) affC3A	
-affC3A: affc3A.c src/bilquad.o src/environ.o
+affIMP:iimp.tab.o bilquad.o environ.o  iimpl.o modsrc.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-	$(MAKE) affIMP
-affIMP: affIMP.c src/bilquad.o src/environ.o	
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-iimp.tab.o: iimp.tab.c 
+iimp.tab.o: iimp.tab.c modsrc.c 
 	$(CC) $(CFLAGS) -c $^
 
 iimp.tab.c : iimp.y
@@ -30,13 +22,7 @@ iimpl.o: iimpl.c
 
 iimpl.c : iimp.l
 	$(LEX) iimpl.c $^
-	
-affc3A.c : AffC3A.l
-	$(LEX) $@ $^	
-	
-affIMP.c : AffIMP.l
-	$(LEX) $@ $^
-	
+
 	
 clean:
 	-rm -f *.o src/*.o  *.tab.* iimpl.c 

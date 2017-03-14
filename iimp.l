@@ -8,7 +8,8 @@ int fileno();
 %}
 %option noinput nounput
 V [a-zA-Z][0-9]*
-I [1-9][0-9]*
+chiffre [0-9]
+I {chiffre}+
 
 %%
 
@@ -25,8 +26,10 @@ I [1-9][0-9]*
 "skip"	{yylval.string = strdup(yytext);return (Sk);}
 {I} 	{yylval.number = atoi(yytext); return (I);}
 {V}	{yylval.string = strdup(yytext); return (V);}
-[\t]+	{;}
+[ \t]+	{;}
 [\n] {;}
+['('] {return '(';}
+[')'] {return ')';}
 . {;}
 <<EOF>> {return(0);}
 %%

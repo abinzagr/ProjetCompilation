@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "utils/modsrc.h"
+#include "utils/environ.h"
+
 int yyparse();
 int yylex();
 int yyerror(char *s);
@@ -12,6 +15,7 @@ ce ne doit pas etre un token */
 
 %union{
     char* string;
+    struct list_obj* node;	
     int number;	
 }
 
@@ -21,29 +25,32 @@ ce ne doit pas etre un token */
 %left Pl Mo
 %right Se El Do
 %token <string> V
-%token <number> I
-%type <string> C
-%type <string> '(' ')' 
-%start C
+%token <number> I 
+%type <node> C E T F 
+%token '(' ')' 
+%start A
 
 %%
-E: E Pl T //{printf("%s\n", $2);}
- | E Mo T //{printf("%s\n", $2);}
- | T
+A: C		    { ENV e = Envalloc(); start(&e,$1);}
+;
 
-T: T Mu F {printf("%s\n", $2);}
- | F
+E: E Pl T {$$=creerNoeudide($1,$3,$2);}
+ | E Mo T {$$=creerNoeudide($1,$3,$2);}
+ | T 
 
-F: '('E')'
- | I {printf("%d ",$1);}
- | V {printf("%s ",$1);}
+T: T Mu F {$$=creerNoeudide($1,$3,$2);}
+ | F 
 
-C : V Af E {printf("%s %s \n", $1,$2);}
-  | Sk
+F: '(' E ')'
+ | I {$$=creerNoeudcons(NULL,NULL,$1);printf("%d ",$1);}
+ | V {$$=creerNoeudide(NULL,NULL,$1);}
+
+C : V Af E { noeud *fils_gauche=creerNoeudide(NULL,NULL,$1);$$=creerNoeudide(fils_gauche,$3,$2);printf("%s ",$2);}
+  | Sk {$$=creerNoeudide(NULL,NULL,$1);}
   | '(' C ')'
-  | If E Th C El C 
-  | Wh E Do C
-  | C Se C
+  | If E Th C El C  //{noeud *fils_gauche=creerNoeudide(NULL,NULL,$1);$$=creerNoeudide(fils_gauche,$3,$2);printf("%s ",$2);}
+  | Wh E Do C  //{noeud *fils_gauche=creerNoeudide(NULL,NULL,$1);$$=creerNoeudide(fils_gauche,$3,$2);printf("%s ",$2);}
+  | C Se C {$$=creerNoeudide($1,$3,$2);}
 ;
 
 %%
