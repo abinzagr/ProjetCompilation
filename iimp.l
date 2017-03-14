@@ -13,19 +13,19 @@ I {chiffre}+
 
 %%
 
-"if"	{yylval.string = strdup(yytext);return (If);}
-"else"	{yylval.string = strdup(yytext);return (El);}
-"while" {yylval.string = strdup(yytext);return (Wh);}
-"do"	{yylval.string = strdup(yytext);return (Do);}
-"then"	{yylval.string = strdup(yytext);return (Th);}
-"-" 	{yylval.string = strdup(yytext);return (Mo);}
-":="	{yylval.string = strdup(yytext);return (Af);}
-"+" 	{yylval.string = strdup(yytext);return (Pl);}
-"*" 	{yylval.string = strdup(yytext);return (Mu);}
-";" 	{yylval.string = strdup(yytext);return (Se);}
-"skip"	{yylval.string = strdup(yytext);return (Sk);}
-{I} 	{yylval.number = atoi(yytext); return (I);}
-{V}	{yylval.string = strdup(yytext); return (V);}
+"if"	{return (If);}
+"else"	{return (El);}
+"while" {return (Wh);}
+"do"	{return (Do);}
+"then"	{return (Th);}
+"-" 	{return (Mo);}
+":="	{return (Af);}
+"+" 	{return (Pl);}
+"*" 	{return (Mu);}
+";" 	{return (Se);}
+"skip"	{return (Sk);}
+{I} 	{yylval = creerNoeudcons(NULL,NULL,atoi(yytext)); return (I);}
+{V}	{yylval = creerNoeudide(NULL,NULL,strdup(yytext));return (V);}
 [ \t]+	{;}
 [\n] {;}
 ['('] {return '(';}
