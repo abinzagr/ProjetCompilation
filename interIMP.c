@@ -1,88 +1,76 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
-#include "utils/modsrc.h"
-#include "utils/environ.h"
+#include "utils/interIMP.h"
+#include "iimp.tab.h"
 
-noeud* creerNoeudcons(noeud*nodeg,noeud* nodd,int cons){
-		noeud* new_ele = (noeud*)malloc(sizeof(noeud));			
-			new_ele->data.valeur = cons;
-			new_ele->fils_gauche = nodeg;
-			new_ele->fils_droit = nodd;
-			new_ele->type =1; 
+char *strdup(const char *s);
+
+noeud* creerNoeud(noeud* node_g, noeud* node_d, int type, int val, char* id){
+	noeud* new_ele = (noeud*)malloc(sizeof(noeud));	
+		
+	new_ele->type = type;
+
+	if(type == V)
+		new_ele->data.valeur = val;
+	else if(type == I)
+		new_ele->data.id = strdup(id);
+	else
+		new_ele->data.valeur = -1;
+
+	new_ele->fils_gauche = node_g;
+	new_ele->fils_droit = node_d;
 	return new_ele;
 }
 
-
-noeud* creerNoeudide(struct list_obj*nodeg,struct list_obj* nodd,char* n_var){
-	noeud* new_ele = (noeud*)malloc(sizeof(noeud));			
-		new_ele->data.var =(char*) malloc(strlen(n_var)*sizeof(char));
-		strcpy(new_ele->data.var,n_var); 
-		new_ele->fils_gauche = nodeg;
-		new_ele->fils_droit = nodd;
-		if(strcmp(n_var,":=")!=0)/* && strcmp(n_var,"*")!=0 && strcmp(n_var,"-")!=0 && strcmp(n_var,"+")!=0 && strcmp(n_var,";")!=0 &&strcmp(n_var,"skip")!=0 && strcmp(n_var,"if")!=0 && strcmp(n_var,"while")!=0 && strcmp(n_var,"do")!=0 && strcmp(n_var,"then")!=0 && strcmp(n_var,"else")!=0 )*/
-			{new_ele->type =2;}
-		else 
-			new_ele->type = 3;			
-	return new_ele;
+void libererArbre(noeud* n){
+	if(!n)
+		return;
+	libererArbre(n->fils_gauche);
+	libererArbre(n->fils_droit);
+	free(n);
 }
 
-
-int traitement(ENV *e,noeud *n) {
+int traitement(ENV *e,noeud *n){
 	if (!n) return 0;
-	printf("%d\n",n->type);
-	switch(n->type) {
-	    case 1:   return n->data.valeur;
-	    case 2:   printf("%s",n->data.var);return valch(*e,n->data.var); 
-	    case 3:  
-		if(strcmp(n->data.var,"while")==0){
-	 		while(traitement(e,n->fils_gauche))
-				traitement(e,n->fils_droit);
-	                return 0;
-		}
-		if(strcmp(n->data.var,"if")==0){
+	switch(n->type){
+		case V:
+			return n->data.valeur;
+		case I:
+			return valch(*e,n->data.id);
+		case If:
 			traitement(e,n->fils_gauche);
                         traitement(e,n->fils_droit);
-                        } 
 			return 0;
-		if(strcmp(n->data.var,"else")==0){
-			if(traitement(e,n->fils_gauche)){
-			traitement(e,n->fils_droit);
-                        }
-			 
-		}
-		if(strcmp(n->data.var,"then")==0){
-			if(!traitement(e,n->fils_gauche)){
-			traitement(e,n->fils_droit);
-                        }
-			 
-		}
-		if(strcmp(n->data.var,":=")==0){	
-			initenv(e,n->fils_gauche->data.var);printf("%s\n",n->fils_gauche->data.var);
-			return affect(*e, n->fils_gauche->data.var, traitement(e,n->fils_droit));				
-		}
-  		if(strcmp(n->data.var,";" )==0){
+		case El:
+			if(traitement(e,n->fils_gauche))
+				traitement(e,n->fils_droit);
+		case Th:
+			if(!traitement(e,n->fils_gauche))
+				traitement(e,n->fils_droit);
+		case Wh:
+			while(traitement(e,n->fils_gauche))
+				traitement(e,n->fils_droit);
+			return 0;
+		case Af:
+			initenv(e,n->fils_gauche->data.id);
+			return affect(*e, n->fils_gauche->data.id, traitement(e,n->fils_droit));
+		case Se:
 			traitement(e,n->fils_gauche);
 			return traitement(e,n->fils_droit);
-
-		}
-	   	if(strcmp(n->data.var,"+" )==0){
-			return( traitement(e,n->fils_gauche) + traitement(e,n->fils_gauche));	
-		}
-		if(strcmp(n->data.var,"-" )==0){
-			return(traitement(e,n->fils_gauche) - traitement(e,n->fils_gauche));			
-		}
-		if(strcmp(n->data.var,"*" )==0){
-			return( traitement(e,n->fils_gauche) * traitement(e,n->fils_gauche));			
-		}
-	    
+		case Pl:
+			return eval(n->data.valeur, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
+		case Mo:
+			return eval(n->data.valeur, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
+		case Mu:
+			return eval(n->data.valeur, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
     }
     return 0;
 }
 
-int start(ENV *e,noeud* n) {
+int start(ENV *e,noeud* n){
     int res = traitement(e,n);
     ecrire_env(*e);
+    libererArbre(n);
     return res;
 }
-

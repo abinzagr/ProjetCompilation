@@ -16,24 +16,21 @@ int traitement(ENV *e,noeud *n){
 	char arg1[20];
 	char arg2[20];
 	char res[20];
-	QUAD* q = NULL;
-	BILQUAD* bq2 = NULL;
+	QUAD q;
 	if (!n) return 0;
 	switch(n->type){
 		case I: // Integer, entier
 			sprintf(etiq, "ET%d", count++);
 			sprintf(arg1, "%d", n->data.valeur);
 			sprintf(res, "CT%d", count);
-			*q = creer_quad(etiq, Afc, arg1, "", res);
-			*bq2 = creer_bilquad(*q);
-			bq = concatq(bq, *bq2);
+			q = creer_quad(etiq, Afc, arg1, "", res);
+			bq = concatq(bq, creer_bilquad(q));
 			break;
 		case V: // Variable, identificateur, char*
 			sprintf(etiq, "ET%d", count++);
 			sprintf(res, "%s", n->data.id);
-			*q = creer_quad(etiq, Sk, "", "", res);
-			*bq2 = creer_bilquad(*q);
-			bq = concatq(bq, *bq2);
+			q = creer_quad(etiq, Sk, "", "", res);
+			bq = concatq(bq, creer_bilquad(q));
 			break;
 		/*case If:
 		case El:
@@ -45,9 +42,8 @@ int traitement(ENV *e,noeud *n){
 			sprintf(etiq, "ET%d", count++);
 			sprintf(arg1, "%s", n->fils_gauche->data.id);
 			sprintf(arg2, "CT%d", count);
-			*q = creer_quad(etiq, Af, arg1, arg2, "");
-			*bq2 = creer_bilquad(*q);
-			bq = concatq(bq, *bq2);
+			q = creer_quad(etiq, Af, arg1, arg2, "");
+			bq = concatq(bq, creer_bilquad(q));
 			break;
 		case Se:
 			traitement(e,n->fils_gauche);

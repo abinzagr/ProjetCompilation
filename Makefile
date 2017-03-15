@@ -24,7 +24,7 @@ interC3A.c: interC3A.l
 compC3A: compC3A.c bilquad.o environ.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-compC3A.c: CompC3A.l
+compC3A.c: compC3A.l
 	$(LEX) $@ $<
 
 iimp.tab.o: iimp.tab.c interIMP.c 
