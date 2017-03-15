@@ -8,12 +8,11 @@ char * strdup(char*);
 int fileno();
 %}
 %option noinput nounput
-I [a-zA-Z0-9]*
+V [a-zA-Z0-9]*
 chiffre [0-9]
-V {chiffre}+
+I {chiffre}+
 
 %%
-
 if	{return If;}
 else	{return El;}
 while 	{return Wh;}
@@ -25,8 +24,8 @@ then	{return Th;}
 "*"	{return Mu;}
 ;	{return Se;}
 skip	{return Sk;}
-{V} 	{yylval.val = atoi(yytext); return V;}
-{I}	{yylval.id = strdup(yytext);return I;}
+{I} 	{yylval.val = atoi(yytext); return I;}
+{V}	{yylval.id = strdup(yytext);return V;}
 [ \t\n]	{;}
 . 	{;}
 <<EOF>> {return 0;}

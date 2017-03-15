@@ -11,9 +11,9 @@ noeud* creerNoeud(noeud* node_g, noeud* node_d, int type, int val, char* id){
 		
 	new_ele->type = type;
 
-	if(type == V)
+	if(type == I)
 		new_ele->data.valeur = val;
-	else if(type == I)
+	else if(type == V)
 		new_ele->data.id = strdup(id);
 	else
 		new_ele->data.valeur = -1;
@@ -34,9 +34,9 @@ void libererArbre(noeud* n){
 int traitement(ENV *e,noeud *n){
 	if (!n) return 0;
 	switch(n->type){
-		case V:
-			return n->data.valeur;
 		case I:
+			return n->data.valeur;
+		case V:
 			return valch(*e,n->data.id);
 		case If:
 			traitement(e,n->fils_gauche);
@@ -45,9 +45,11 @@ int traitement(ENV *e,noeud *n){
 		case El:
 			if(traitement(e,n->fils_gauche))
 				traitement(e,n->fils_droit);
+			return 0;
 		case Th:
 			if(!traitement(e,n->fils_gauche))
 				traitement(e,n->fils_droit);
+			return 0;
 		case Wh:
 			while(traitement(e,n->fils_gauche))
 				traitement(e,n->fils_droit);
@@ -59,11 +61,9 @@ int traitement(ENV *e,noeud *n){
 			traitement(e,n->fils_gauche);
 			return traitement(e,n->fils_droit);
 		case Pl:
-			return eval(n->data.valeur, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
 		case Mo:
-			return eval(n->data.valeur, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
 		case Mu:
-			return eval(n->data.valeur, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
+			return eval(n->type, traitement(e, n->fils_gauche), traitement(e, n->fils_droit));
     }
     return 0;
 }

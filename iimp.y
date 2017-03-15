@@ -15,8 +15,8 @@ int yyerror(char *s);
 	struct list_obj* n;
 }
 
-%token<val> V
-%token<id> I
+%token<id> V
+%token<val> I
 %token If El Wh Do Th Mo Pl Mu Se Sk Af
 %left '('
 %start A
@@ -37,14 +37,14 @@ T: T Mu F 		{$$=creerNoeud($1,$3,Mu, -1, "");}
 ;
 
 F: '(' E ')'		{$$=$2;}
-| I 			{$$=creerNoeud(NULL, NULL, I, -1, $1);}
-| V			{$$=creerNoeud(NULL, NULL, V, $1, "");}
+| I 			{$$=creerNoeud(NULL, NULL, I, $1, "");}
+| V			{$$=creerNoeud(NULL, NULL, V, -1, $1);}
 ;
 
-C : V Af E 		{$$=creerNoeud(creerNoeud(NULL, NULL, V, $1, ""),$3,Af, -1, "");}
+C : V Af E 		{$$=creerNoeud(creerNoeud(NULL, NULL, V, -1, $1),$3,Af, -1, "");}
 | Sk 			{$$=creerNoeud(NULL,NULL,Sk, -1, "");}
 | '(' C ')' 		{$$=$2;}
-| If E Th C El C 	{$$=creerNoeud(creerNoeud($2,$4,Th, -1, ""),creerNoeud($2,$6, El, -1, ""),If, -1, "");}
+| If E Th C El C 	{$$=creerNoeud(creerNoeud($2,$4,Th, -1, ""),creerNoeud($4,$6, El, -1, ""),If, -1, "");}
 | Wh E Do C 		{$$=creerNoeud($2,$4,Wh, -1, "");}
 | C Se C 		{$$=creerNoeud($1,$3,Se, -1, "");}
 ;
@@ -61,8 +61,9 @@ int yywrap(){
 	return -1;
 }
 
-int main(){
-	return yyparse();
+int main(int argc, char **argv){
+	yyparse();
+	return EXIT_SUCCESS;
 }
 
 
