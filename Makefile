@@ -8,10 +8,26 @@ LDFLAGS:= -lfl
 %.o : %.c %.h 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-affIMP:iimp.tab.o bilquad.o environ.o  iimpl.o modsrc.o
+interIMP:iimp.tab.o bilquad.o environ.o  iimpl.o interIMP.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-iimp.tab.o: iimp.tab.c modsrc.c 
+	make interC3A
+
+interC3A: interC3A.c bilquad.o environ.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+interC3A.c: interC3A.l
+	$(LEX) $@ $< 
+
+	make compC3A
+
+compC3A: compC3A.c bilquad.o environ.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+compC3A.c: CompC3A.l
+	$(LEX) $@ $<
+
+iimp.tab.o: iimp.tab.c interIMP.c 
 	$(CC) $(CFLAGS) -c $^
 
 iimp.tab.c : iimp.y

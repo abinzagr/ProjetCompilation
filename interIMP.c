@@ -20,7 +20,7 @@ noeud* creerNoeudide(struct list_obj*nodeg,struct list_obj* nodd,char* n_var){
 		strcpy(new_ele->data.var,n_var); 
 		new_ele->fils_gauche = nodeg;
 		new_ele->fils_droit = nodd;
-		if(strcmp(n_var,":=")!=0 && strcmp(n_var,"*")!=0 && strcmp(n_var,"-")!=0 && strcmp(n_var,"+")!=0 && strcmp(n_var,";")!=0 &&strcmp(n_var,"skip")!=0 && strcmp(n_var,"if")!=0 && strcmp(n_var,"while")!=0 && strcmp(n_var,"do")!=0 && strcmp(n_var,"then")!=0 && strcmp(n_var,"else")!=0 )
+		if(strcmp(n_var,":=")!=0)/* && strcmp(n_var,"*")!=0 && strcmp(n_var,"-")!=0 && strcmp(n_var,"+")!=0 && strcmp(n_var,";")!=0 &&strcmp(n_var,"skip")!=0 && strcmp(n_var,"if")!=0 && strcmp(n_var,"while")!=0 && strcmp(n_var,"do")!=0 && strcmp(n_var,"then")!=0 && strcmp(n_var,"else")!=0 )*/
 			{new_ele->type =2;}
 		else 
 			new_ele->type = 3;			

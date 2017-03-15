@@ -43,12 +43,17 @@ F: '(' E ')'
  | I {$$=$1;}
  | V {$$=$1;}
 
-C : V Af E { $$=creerNoeudide($1,$3,":="); ENV e = Envalloc(); start(&e,$$);}
+C1 : V Af E { $$=creerNoeudide($1,$3,":=");} //ENV e = Envalloc(); start(&e,$$);}
   | Sk {$$=creerNoeudide(NULL,NULL,"skip");}
   | '(' C ')' {$$=$2;}
   | If E Th C El C {$$=creerNoeudide(creerNoeudide($2,$4,"then"),creerNoeudide($4,$6,"else"),"if");}
   | Wh E Do C  {$$=creerNoeudide($2,$4,"while");}
   | C Se C {$$=creerNoeudide($1,$3,";");}
+
+C: C Se C1		{$$=creerNoeudide($1,$3,";");}
+ | C1			{$$ = $1;}
+ ;
+
 ;
 
 %%
