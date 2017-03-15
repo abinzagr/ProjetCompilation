@@ -8,20 +8,21 @@ LDFLAGS:= -lfl
 %.o : %.c %.h 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-affIMP:iimp.tab.o bilquad.o environ.o  iimpl.o interIMP.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+affIMP: iimp.tab.o environ.o iimpl.o noeud_struct.c interIMP.o
+	$(CC) $(CFLAGS) -o $@ $^ 
 
-iimp.tab.o: iimp.tab.c interIMP.c 
-	$(CC) $(CFLAGS) -c $^
+	make compIMP
+compIMP: noeud_struct.o bilquad.o iimp.tab.o iimpl.o environ.o compIMP.o
+	$(CC) $(CFLAGS) -o $@ $^
 
 iimp.tab.c : iimp.y
 	$(BISON)  $^
 	
 iimpl.o: iimpl.c 
-	$(CC) $(CFLAGS) -c $^
+	$(CC) $(CFLAGS) -c $^ $(LDFLAGS)
 
 iimpl.c : iimp.l
-	$(LEX) iimpl.c $^
+	$(LEX) iimpl.c $^ 
 
 	
 clean:
