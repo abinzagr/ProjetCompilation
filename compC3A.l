@@ -5,9 +5,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "environc3a.h"
-#include "bilquad.h"
+#include "utils/environ.h"
+#include "utils/bilquad.h"
 
+int fileno();
 BILQUAD biliste;
 int ligne = 1;
 char* etiquette;
@@ -24,6 +25,7 @@ void compilerc3a(QUAD);
 void ecrirevar(FILE* fd, ENV e);
 
 %}
+%option nounput noinput
 
 ETIQ [A-Z][A-Z0-9]*
 OP [A-Z][a-z]*
@@ -62,9 +64,9 @@ else
 biliste =concatq(biliste,creer_bilquad(creer_quad(etiquette,intop(operateur),arg1,arg2,resultat)));
 raz();}
 
-<ETIQUETTE,RESULTAT><<EOF>> {printf("tout s'est bien déroulé\n");/*ecrire_bilquad(biliste);*/ return EXIT_SUCCESS;}
+<ETIQUETTE,RESULTAT><<EOF>> {/*ecrire_bilquad(biliste);*/ return EXIT_SUCCESS;}
 
-<OPERATEUR,ARGUMENT1,ARGUMENT2><<EOF>> {printf("il y eu des erreurs\n");/*ecrire_bilquad(biliste)*/;return EXIT_FAILURE;}
+<OPERATEUR,ARGUMENT1,ARGUMENT2><<EOF>> {/*ecrire_bilquad(biliste)*/;return EXIT_FAILURE;}
 .|\n {}
 %%
 
@@ -110,25 +112,22 @@ return EXIT_FAILURE ;
 }
 
 if(strcmp(argv[1],"i") == 0){
-//Interprétation du fichier C3A
 ENV e = Envalloc();
 
 interpreterc3a(&e, biliste.debut);
 ecrire_env(e);
-libenv(e);
+//libenv(e);
 }
 else
 if(strcmp(argv[1],"c") == 0)
 compilerc3a(biliste.debut);
 
 
-libbilquad(biliste);
+//libbilquad(biliste);
 
 return EXIT_SUCCESS;
 }
 
-
-/************************ Interpreteur************************/ 
 void interpreterc3a(ENV* e ,QUAD curseur){
 while(curseur != NULL){
 switch(curseur->OP){
@@ -140,13 +139,12 @@ break;
 
 case Mu :
 case Mo :
-case Pl : //creer la var res dans e (si elle existe elle ne sera pas créée)
-//ensuite recuperer les valeur des arguments pour faire les opérations dessus
+case Pl :
 initenv(e,curseur->RES);
 affect(*e,curseur->RES,eval (curseur->OP, valch(*e,curseur->ARG1),valch(*e,curseur->ARG2)));
 break;
 
-case Af : //recuperer l'environnement associé et affecté la valeur 
+case Af :
 initenv(e,curseur->ARG1);
 affect(*e, curseur->ARG1, valch(*e, curseur->ARG2));
 break;
@@ -175,8 +173,6 @@ curseur = curseur->SUIV;
 
 }
 }
-
-/*************************PARTIE STATIC DU COMPILATEUR******************/
 
 void ecrireinit(FILE* fd){
 fprintf(fd,"\t.pos\t 0\t#debut zone code \n");
@@ -236,15 +232,11 @@ curseur = curseur->SUIV;
 }
 }
 
-/************************ Compilateur ************************/
 void compilerc3a(QUAD liste){
-/*****Init Environnement*****/
 ENV e = Envalloc();
 interpreterc3a(&e,liste);
-/*****INIT Fichier sortie ********/
 FILE* fd = fopen("out.ys", "w");
 ecrireinit(fd);
-//********Mega switch pour tout transformer ********//
 while(liste!=NULL){
 switch(liste->OP){
 case Sk :
@@ -309,6 +301,6 @@ liste=liste->SUIV;
 
 ecrirefct(fd);
 ecrirevar(fd,e);
-libenv(e);
+//libenv(e);
 }
 
