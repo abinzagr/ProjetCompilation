@@ -64,31 +64,32 @@ else
 biliste =concatq(biliste,creer_bilquad(creer_quad(etiquette,intop(operateur),arg1,arg2,resultat)));
 raz();}
 
-<ETIQUETTE,RESULTAT><<EOF>> {/*ecrire_bilquad(biliste);*/ return EXIT_SUCCESS;}
+<ETIQUETTE,RESULTAT><<EOF>> {return EXIT_SUCCESS;}
 
-<OPERATEUR,ARGUMENT1,ARGUMENT2><<EOF>> {/*ecrire_bilquad(biliste)*/;return EXIT_FAILURE;}
+<OPERATEUR,ARGUMENT1,ARGUMENT2><<EOF>> {return EXIT_FAILURE;}
 .|\n {}
 %%
 
 int intop(char * op){
-if(strcmp(op,"Pl") == 0)
-return Pl;
-if(strcmp(op,"Mo") == 0)
-return Mo;
-if(strcmp(op,"Mu") == 0)
-return Mu;
-if(strcmp(op,"Afc") == 0)
-return Afc;
-if(strcmp(op,"Af") == 0)
-return Af;
-if(strcmp(op,"Sk") == 0)
-return Sk;
-if(strcmp(op,"St") == 0)
-return St;
-if(strcmp(op,"Jp") == 0)
-return Jp;
-if(strcmp(op,"Jz") == 0)
-return Jz;
+	if(strcmp(op,"Pl") == 0)
+		return Pl;
+	if(strcmp(op,"Mo") == 0)
+		return Mo;
+	if(strcmp(op,"Mu") == 0)
+		return Mu;
+	if(strcmp(op,"Afc") == 0)
+		return Afc;
+	if(strcmp(op,"Af") == 0)
+		return Af;
+	if(strcmp(op,"Sk") == 0)
+		return Sk;
+	if(strcmp(op,"St") == 0)
+		return St;
+	if(strcmp(op,"Jp") == 0)
+		return Jp;
+	if(strcmp(op,"Jz") == 0)
+		return Jz;
+	return 0;
 }
 
 void raz(){
@@ -116,14 +117,10 @@ ENV e = Envalloc();
 
 interpreterc3a(&e, biliste.debut);
 ecrire_env(e);
-//libenv(e);
 }
 else
 if(strcmp(argv[1],"c") == 0)
 compilerc3a(biliste.debut);
-
-
-//libbilquad(biliste);
 
 return EXIT_SUCCESS;
 }
@@ -160,7 +157,7 @@ return ;
 case Jz : 
 if (valch(*e, curseur->ARG1) != 0)
 break;
-//else
+
 case Jp : 
 curseur = rechbq(curseur->RES, biliste);
 break;
@@ -297,10 +294,7 @@ break;
 liste=liste->SUIV;
 }
 
-//////////////////////////////////////////////////////
-
 ecrirefct(fd);
 ecrirevar(fd,e);
-//libenv(e);
 }
 

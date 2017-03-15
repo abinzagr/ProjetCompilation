@@ -1,3 +1,16 @@
+/*
+Fait par BINZAGR BOISSETRI Ahmad et GHIBERT Lucas
+
+Q1)
+	- Fonction int traitement(ENV* e, noeud* n) présente dans interIMP.c
+Q2)
+	- Fonction int main(int argc, char *argv[]) présente dans interC3A.l
+Q3)
+	- Fonction int traitement(ENV* e, noeud* n) présente dans compIMP.c
+Q4)
+	- Fonction int main(int argc, char **argv) présente dans compC3A.l
+*/
+
 %{
 #include <stdio.h>
 #include <string.h>
