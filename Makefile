@@ -1,48 +1,44 @@
-# YACC = bison -d
 BISON = bison -d
 LEX = flex -o 
 CC = gcc
-CFLAGS=-std=c99 -Wall -g
-LDFLAGS:= -lfl
+CFLAGS =-std=c99 -Wall -g
+LDFLAGS = -lfl
+EXE = interIMP interC3A compIMP compC3A iimp
+
+all:$(EXE)
 
 %.o : %.c %.h 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-interIMP:iimp.tab.o bilquad.o environ.o  iimpl.o interIMP.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+iimp.tab.c iimp.tab.h: iimp.y
+	$(BISON)  $^ -o $@
 
-	make interC3A
-interC3A: interC3A.c bilquad.o environ.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+iimp.c: iimp.l iimp.tab.h
+	$(LEX) $@ $<
+
+interIMP:iimp.tab.o bilquad.o environ.o iimp.o noeud_struct.o interIMP.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 interC3A.c: interC3A.l
 	$(LEX) $@ $< 
 
-iimp.tab.o: iimp.tab.c interIMP.c 
-	$(CC) $(CFLAGS) -c $^
-
-	make compIMP
-compIMP: noeud_struct.o bilquad.o iimp.tab.o iimpl.o environ.o compIMP.o
+compIMP: noeud_struct.o bilquad.o iimp.tab.o iimp.o environ.o compIMP.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-iimp.tab.c : iimp.y
-	$(BISON)  $^
-	
-iimpl.o: iimpl.c 
-	$(CC) $(CFLAGS) -c $^ $(LDFLAGS)
-
-iimpl.c : iimp.l
-	$(LEX) iimpl.c $^ 
-
-	make compC3A
 compC3A.c: compC3A.l
 	$(LEX) $@ $<
 
 compC3A: compC3A.c bilquad.o environc3a.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-	
+
+interC3A: interC3A.c bilquad.o environ.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+iimp: compIMP compC3A iimp.c
+	$(CC) $(CFLAGS) -o $@ iimp.c
+
 clean:
-	-rm -f *.o src/*.o  *.tab.* iimpl.c compC3A.c
+	-rm -f *.o  *.tab.* *.output iimp.c compC3A.c interC3A.c
 	
 
 
