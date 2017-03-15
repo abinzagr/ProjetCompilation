@@ -2,56 +2,51 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "utils/modsrc.h"
+#include "utils/interIMP.h"
 #include "utils/environ.h"
-#define YYSTYPE noeud*
 int yyparse();
 int yylex();
 int yyerror(char *s);
 %}
 
-/* l'element par lequel commence l'analyse,
-ce ne doit pas etre un token */
+%union{
+	int val;
+	char* id;
+	struct list_obj* n;
+}
 
-/*%union{
-    char* string;
-    struct list_obj* node;	
-    int number;		
-}*/
-
-%token If El Wh Do Th Mo Pl Mu Se Sk Af V I
-/*%left Af
-%left Mu
-%left Pl Mo
-%right Se El Do
-%type <> C E T F
-%token '(' ')'*/ 
+%token<val> V
+%token<id> I
+%token If El Wh Do Th Mo Pl Mu Se Sk Af
+%left '('
 %start A
+
+%type<n> E T F C
 
 %%
 A: C			{ENV e = Envalloc(); start(&e,$1);}
 ;
 
-E: E Pl T 		{$$=creerNoeudide($1,$3,"+");}
-| E Mo T 		{$$=creerNoeudide($1,$3,"-");}
-| T 
+E: E Pl T 		{$$=creerNoeud($1,$3,Pl, -1, "");}
+| E Mo T 		{$$=creerNoeud($1,$3,Mo, -1, "");}
+| T			{$$=$1;}
 ;
 
-T: T Mu F 		{$$=creerNoeudide($1,$3,"*");}
-| F 
+T: T Mu F 		{$$=creerNoeud($1,$3,Mu, -1, "");}
+| F			{$$=$1;} 
 ;
 
-F: '(' E ')'
-| I 			{$$=$1;}
-| V			{$$=$1;}
+F: '(' E ')'		{$$=$2;}
+| I 			{$$=creerNoeud(NULL, NULL, I, -1, $1);}
+| V			{$$=creerNoeud(NULL, NULL, V, $1, "");}
 ;
 
-C : V Af E 		{$$=creerNoeudide($1,$3,":=");}
-| Sk 			{$$=creerNoeudide(NULL,NULL,"skip");}
+C : V Af E 		{$$=creerNoeud(creerNoeud(NULL, NULL, V, $1, ""),$3,Af, -1, "");}
+| Sk 			{$$=creerNoeud(NULL,NULL,Sk, -1, "");}
 | '(' C ')' 		{$$=$2;}
-| If E Th C El C 	{$$=creerNoeudide(creerNoeudide($2,$4,"then"),creerNoeudide($4,$6,"else"),"if");}
-| Wh E Do C 		{$$=creerNoeudide($2,$4,"while");}
-| C Se C 		{$$=creerNoeudide($1,$3,";");}
+| If E Th C El C 	{$$=creerNoeud(creerNoeud($2,$4,Th, -1, ""),creerNoeud($2,$6, El, -1, ""),If, -1, "");}
+| Wh E Do C 		{$$=creerNoeud($2,$4,Wh, -1, "");}
+| C Se C 		{$$=creerNoeud($1,$3,Se, -1, "");}
 ;
 
 %%

@@ -8,10 +8,10 @@ LDFLAGS:= -lfl
 %.o : %.c %.h 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-affIMP:iimp.tab.o bilquad.o environ.o  iimpl.o modsrc.o
+affIMP:iimp.tab.o bilquad.o environ.o  iimpl.o interIMP.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-iimp.tab.o: iimp.tab.c modsrc.c 
+iimp.tab.o: iimp.tab.c interIMP.c 
 	$(CC) $(CFLAGS) -c $^
 
 iimp.tab.c : iimp.y
